@@ -30,12 +30,10 @@ export default function LoginForm() {
             Message d'Erreur
           </div>
 
-          <div className="text-base text-center">
-            Vous n’avez pas de compte ?{" "}
-            <Link href="/register" className="underline font-semibold">
-              S’inscrire
-            </Link>
-          </div>
+        <Link className="text-sm mt-3 text-right" href={'/register'}>Vous n’avez pas de compte ?{" "}
+        <span className="underline">S'inscrire</span>
+        </Link>
+         
         </form>
       </div>
     </div>
