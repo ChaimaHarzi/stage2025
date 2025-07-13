@@ -1,5 +1,7 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+/** @format */
+
+"use client";
+
 import "./globals.css";
 import { Inter } from "next/font/google";
 const inter = Inter({
@@ -8,15 +10,17 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
+import { SessionProvider } from "next-auth/react";
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr"  className={inter.variable}>
+    <html lang='fr' className={inter.variable}>
       <body>
-        {children}
+        <SessionProvider>{children}</SessionProvider>
       </body>
     </html>
   );
