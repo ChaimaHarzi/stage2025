@@ -1,3 +1,4 @@
+console.log("NextAuth handler loaded");
 import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
@@ -8,9 +9,9 @@ import Email from "next-auth/providers/email";
 
 
 
-const nextAuthHandler = NextAuth({
+const authOptions = {
   adapter: PrismaAdapter(db),
-  session: { strategy: "jwt" },
+  session: { strategy: "jwt" as const },
   providers: [
     Credentials({
       name: "Credentials",
@@ -19,6 +20,7 @@ const nextAuthHandler = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
+        console.log("Authorize called", credentials);
         try {
           if (!credentials?.email || !credentials?.password) {
             console.error("Missing email or password in credentials");
@@ -47,9 +49,6 @@ const nextAuthHandler = NextAuth({
       }
     }),
   ],
-  
-});
+};
 
-export const GET = nextAuthHandler.GET;
-export const POST = nextAuthHandler.POST;
-export const { signIn, signOut, auth } = nextAuthHandler;
+export { authOptions };

@@ -1,6 +1,6 @@
 //this file will containg all the servr actions related to the authentication 
 "use server";
-import { signIn, signOut } from "@/auth"
+import { signIn, signOut } from "next-auth/react"
 import { revalidatePath } from "next/cache";
 // or alternatively:
 import { AuthError } from "@auth/core/errors";
@@ -31,14 +31,10 @@ import { db } from "../../db";
 export const getUserByEmail = async (email: string) => {
   try {
     const user = await db.utilisateur.findUnique({ where: { email } });
-    if (!user) {
-      // Optionally log or handle the not found case
-      return null;
-    }
-    return user;
+    return user; // Will be null if not found
   } catch (error) {
     console.error(`Error in getUserByEmail for email ${email}:`, error);
-    throw new Error('Failed to fetch user by email');
+    throw new Error('Database error while fetching user by email');
   }
 };
 
@@ -78,7 +74,7 @@ export const loginWithCreds = async (formData: FormData) => {
           return { error: "Authentication failed" };
       }
     }
-    return { error: "Erreur lors de la connexion" };
+    return { error: error instanceof Error ? error.message : String(error) };
   }
   revalidatePath("/");
   return {};
