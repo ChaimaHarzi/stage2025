@@ -114,7 +114,7 @@ export default function LoginForm() {
         <h1 className='text-3xl font-extrabold mb-8 text-center text-green-700 drop-shadow-sm'>
           Veuillez saisir vos informations
         </h1>
-        <form className='flex flex-col gap-5' onSubmit={handleSubmit}>
+        <form className='flex flex-col gap-5 items-center' onSubmit={handleSubmit}>
           <div className='flex flex-col gap-0'>
   <div className='relative flex items-center'>
     <span className='absolute left-1 top-1/2 -translate-y-1/2 text-green-400 pointer-events-none'>
