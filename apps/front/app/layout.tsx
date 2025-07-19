@@ -11,6 +11,8 @@ const inter = Inter({
 });
 
 import { SessionProvider } from "next-auth/react";
+import { ThemeProvider } from "@/components/shared/Theme/ThemeContext";
+import AppHeader from "@/components/shared/Header/AppHeader";
 
 export default function RootLayout({
   children,
@@ -20,7 +22,11 @@ export default function RootLayout({
   return (
     <html lang='fr' className={inter.variable}>
       <body>
-        <SessionProvider>{children}</SessionProvider>
+        <SessionProvider>
+        <ThemeProvider>
+          {children}
+        </ThemeProvider> 
+        </SessionProvider>
       </body>
     </html>
   );
