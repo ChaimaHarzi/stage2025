@@ -11,8 +11,7 @@ const inter = Inter({
 });
 
 import { SessionProvider } from "next-auth/react";
-import { ThemeProvider } from "@/components/shared/Theme/ThemeContext";
-import AppHeader from "@/components/shared/Header/AppHeader";
+import 'datatables.net-dt/css/jquery.dataTables.css';
 
 export default function RootLayout({
   children,
@@ -23,9 +22,9 @@ export default function RootLayout({
     <html lang='fr' className={inter.variable}>
       <body>
         <SessionProvider>
-        <ThemeProvider>
-          {children}
-        </ThemeProvider> 
+          <main className="bg-[#f5f6fa] min-h-screen">
+            {children}
+          </main>
         </SessionProvider>
       </body>
     </html>

@@ -10,5 +10,5 @@ module.exports = {
         sans: ["var(--font-inter)", "ui-sans-serif", "system-ui"],
       },},
   },
-  plugins: [],
+  plugins: [require("preline/plugin")],
 };
