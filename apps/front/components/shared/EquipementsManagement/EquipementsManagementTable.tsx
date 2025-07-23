@@ -266,12 +266,12 @@ export default function EquipementsManagementTable() {
               ].map((row, idx) => (
                 <tr
                   key={row.reference + idx}
-                  className="transition-colors group bg-white dark:bg-neutral-900"
+                  className="transition-all duration-200 ease-in-out bg-white hover:bg-gray-100 hover:shadow-sm group"
                 >
-                  <td className="p-2 font-medium text-gray-900 group-hover:text-gray-900 dark:group-hover:text-neutral-100 border-r border-gray-200 dark:border-gray-700">{row.reference}</td>
-                  <td className="p-2 text-gray-700 group-hover:text-gray-900 dark:text-neutral-300 dark:group-hover:text-neutral-100 border-r border-gray-200 dark:border-gray-700">{row.nom}</td>
-                  <td className="p-2 text-gray-700 group-hover:text-gray-900 dark:text-neutral-300 dark:group-hover:text-neutral-100 border-r border-gray-200 dark:border-gray-700">{row.famille}</td>
-                  <td className="p-2 text-gray-700 group-hover:text-gray-900 dark:text-neutral-300 dark:group-hover:text-neutral-100">{row.categorie}</td>
+                  <td className="p-2 font-medium text-gray-900 group-hover:text-gray-900">{row.reference}</td>
+                  <td className="p-2 text-gray-700 group-hover:text-gray-900">{row.nom}</td>
+                  <td className="p-2 text-gray-700 group-hover:text-gray-900">{row.famille}</td>
+                  <td className="p-2 text-gray-700 group-hover:text-gray-900">{row.categorie}</td>
                   <td className="p-2">
                     <div className="flex items-center gap-3">
                       {/* Description Icon - Blue */}
@@ -331,3 +331,4 @@ export default function EquipementsManagementTable() {
     </>
   );
 }
+
