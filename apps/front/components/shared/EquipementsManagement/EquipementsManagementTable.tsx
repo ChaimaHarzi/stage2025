@@ -275,22 +275,22 @@ export default function EquipementsManagementTable() {
                   <td className="p-2">
                     <div className="flex items-center gap-3">
                       {/* Description Icon - Blue */}
-                      <button title="Voir la description" className="hover:bg-blue-100 p-1 rounded transition-colors">
-                        <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <button title="Voir la description" className="hover:bg-blue-100 p-1 rounded transition-all duration-200 group/icon">
+                        <svg className="w-5 h-5 text-blue-500 transition-transform duration-200 group-hover/icon:scale-110" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M4 4h16v16H4z" />
                           <path strokeLinecap="round" strokeLinejoin="round" d="M8 8h8M8 12h8M8 16h4" />
                         </svg>
                       </button>
                       {/* Edit Icon - Green */}
-                      <button title="Modifier" className="hover:bg-green-100 p-1 rounded transition-colors">
-                        <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <button title="Modifier" className="hover:bg-green-100 p-1 rounded transition-all duration-200 group/icon">
+                        <svg className="w-5 h-5 text-green-500 transition-transform duration-200 group-hover/icon:scale-110" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 3.487a2.1 2.1 0 0 1 2.97 2.97l-9.193 9.193a2 2 0 0 1-.707.464l-3.11 1.037a.5.5 0 0 1-.634-.634l1.037-3.11a2 2 0 0 1 .464-.707l9.193-9.193zm0 0L20.5 7.125" />
                           <rect x="2" y="20" width="20" height="2" rx="1" fill="currentColor" />
                         </svg>
                       </button>
                       {/* Delete Icon - Red */}
-                      <button title="Supprimer" className="hover:bg-red-100 p-1 rounded transition-colors">
-                        <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <button title="Supprimer" className="hover:bg-red-100 p-1 rounded transition-all duration-200 group/icon">
+                        <svg className="w-5 h-5 text-red-500 transition-transform duration-200 group-hover/icon:scale-110" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
@@ -331,4 +331,5 @@ export default function EquipementsManagementTable() {
     </>
   );
 }
+
 
