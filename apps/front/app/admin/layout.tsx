@@ -14,12 +14,12 @@ const AdminPageLayout = ({ children }: { children: React.ReactNode }) => {
     }, []);
     const { isExpanded, isMobileOpen, isHovered } = useSidebar();
     return (
-        <div className="flex h-screen bg-white">
+        <div className="bg-[#f5f6fa] flex h-screen">
             <AppSidebar />
             <Backdrop />
             <div className={`relative flex flex-1 flex-col overflow-y-auto overflow-x-hidden transition-all duration-300 ease-in-out ${(isExpanded || isHovered) && !isMobileOpen ? 'lg:ml-[290px]' : 'lg:ml-[90px]'}`}>
                 <AppHeader />
-                <main className="bg-[#f5f6fa] min-h-screen">
+                <main className=" min-h-screen">
                     <div className="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
                         {children}
                     </div>
