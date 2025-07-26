@@ -2,6 +2,7 @@
 "use client";
 import "./globals.css";
 import 'flowbite';
+import { Theme } from "@radix-ui/themes";
 import { Inter } from "next/font/google";
 const inter = Inter({
   subsets: ["latin"],
@@ -20,11 +21,13 @@ export default function RootLayout({
   return (
     <html lang='fr' className={inter.variable}>
       <body>
+  <Theme>
         <SessionProvider>
           <main className="bg-[#f5f6fa] min-h-screen">
             {children}
           </main>
         </SessionProvider>
+  </Theme>
       </body>
     </html>
   );

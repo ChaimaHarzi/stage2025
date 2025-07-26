@@ -1,6 +1,8 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "flowbite/src/themes/default";
+@import "@radix-ui/themes/styles.css";
+
 @plugin "flowbite/plugin";
 
 
