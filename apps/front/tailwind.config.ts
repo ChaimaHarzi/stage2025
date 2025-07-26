@@ -3,12 +3,13 @@ module.exports = {
   darkMode: "class",
   content: [
     "./apps/front/app/**/*.{js,ts,jsx,tsx}",
-    "./apps/front/components/**/*.{js,ts,jsx,tsx}"
+    "./apps/front/components/**/*.{js,ts,jsx,tsx}",
+    'node_modules/flowbite-react/**/*.{js,jsx,ts,tsx}'
   ],
   theme: {
     extend: { fontFamily: {
         sans: ["var(--font-inter)", "ui-sans-serif", "system-ui"],
       },},
   },
-  plugins: [require("preline/plugin")],
+  plugins: [require("preline/plugin"),require('flowbite/plugin')],
 };

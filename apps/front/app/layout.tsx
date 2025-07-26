@@ -1,8 +1,7 @@
 /** @format */
-
 "use client";
-
 import "./globals.css";
+import 'flowbite';
 import { Inter } from "next/font/google";
 const inter = Inter({
   subsets: ["latin"],
