@@ -9,7 +9,9 @@ interface CrudModalProps {
 
 interface FormErrors {
   name?: string;
-  price?: string;
+  reference?: string;
+  status?: string;
+  famille?: string;
   category?: string;
 }
 
@@ -86,9 +88,14 @@ export default function addModal({ isOpen, onClose, onSubmit }: CrudModalProps) 
         if (!value.trim()) return 'Le nom est requis';
         if (value.trim().length < 3) return 'Le nom doit contenir au moins 3 caractères';
         break;
-      case 'price':
-        if (!value) return 'Le prix est requis';
-        if (parseFloat(value) <= 0) return 'Le prix doit être supérieur à 0';
+      case 'reference':
+        if (!value.trim()) return 'La référence est requise';
+        break;
+      case 'status':
+        if (!value) return 'Le statut est requis';
+        break;
+      case 'famille':
+        if (!value) return 'La famille est requise';
         break;
       case 'category':
         if (!value) return 'La catégorie est requise';
@@ -120,7 +127,7 @@ export default function addModal({ isOpen, onClose, onSubmit }: CrudModalProps) 
     
     // Validate all fields
     const newErrors: FormErrors = {};
-    const fieldsToValidate = ['name', 'price', 'category'];
+    const fieldsToValidate = ['name', 'reference', 'status', 'famille', 'category'];
     
     fieldsToValidate.forEach(field => {
       const value = formData.get(field) as string;
@@ -213,62 +220,99 @@ export default function addModal({ isOpen, onClose, onSubmit }: CrudModalProps) 
               {/* Name field */}
               <div>
                 <label htmlFor="name" className="block mb-2 text-sm font-semibold text-gray-700 dark:text-gray-200">
-                  Nom de l'équipement <span className="text-red-500">*</span>
+                  Nom <span className="text-red-500">*</span>
                 </label>
-                <div className="relative">
-                  <input
-                    ref={firstInputRef}
-                    type="text"
-                    name="name"
-                    id="name"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    className={`bg-gray-50 border ${
-                      errors.name && touched.has('name')
-                        ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
-                        : 'border-gray-300 focus:ring-[#00A9E0] focus:border-[#00A9E0]'
-                    } text-gray-900 text-sm rounded-lg block w-full p-3 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white transition-all duration-200`}
-                    placeholder="Ex: Ordinateur portable Dell"
-                  />
-                  {errors.name && touched.has('name') && (
-                    <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                      <svg className="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                  )}
-                </div>
+                <input
+                  ref={firstInputRef}
+                  type="text"
+                  name="name"
+                  id="name"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  className={`bg-gray-50 border ${
+                    errors.name && touched.has('name')
+                      ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
+                      : 'border-gray-300 focus:ring-[#00A9E0] focus:border-[#00A9E0]'
+                  } text-gray-900 text-sm rounded-lg block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white transition-all duration-200`}
+                  placeholder="Ex: Ordinateur portable Dell"
+                />
                 {errors.name && touched.has('name') && (
                   <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.name}</p>
                 )}
               </div>
 
-              {/* Price field */}
+              {/* Reference field */}
               <div>
-                <label htmlFor="price" className="block mb-2 text-sm font-semibold text-gray-700 dark:text-gray-200">
-                  Prix <span className="text-red-500">*</span>
+                <label htmlFor="reference" className="block mb-2 text-sm font-semibold text-gray-700 dark:text-gray-200">
+                  Référence <span className="text-red-500">*</span>
                 </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                    <span className="text-gray-500 dark:text-gray-400">€</span>
-                  </div>
-                  <input
-                    type="number"
-                    name="price"
-                    id="price"
-                    step="0.01"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    className={`bg-gray-50 border ${
-                      errors.price && touched.has('price')
-                        ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
-                        : 'border-gray-300 focus:ring-[#00A9E0] focus:border-[#00A9E0]'
-                    } text-gray-900 text-sm rounded-lg block w-full pl-8 pr-3 py-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white transition-all duration-200`}
-                    placeholder="299.99"
-                  />
-                </div>
-                {errors.price && touched.has('price') && (
-                  <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.price}</p>
+                <input
+                  type="text"
+                  name="reference"
+                  id="reference"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  className={`bg-gray-50 border ${
+                    errors.reference && touched.has('reference')
+                      ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
+                      : 'border-gray-300 focus:ring-[#00A9E0] focus:border-[#00A9E0]'
+                  } text-gray-900 text-sm rounded-lg block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white transition-all duration-200`}
+                  placeholder="Ex: REF-001"
+                />
+                {errors.reference && touched.has('reference') && (
+                  <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.reference}</p>
+                )}
+              </div>
+
+              {/* Status field */}
+              <div>
+                <label htmlFor="status" className="block mb-2 text-sm font-semibold text-gray-700 dark:text-gray-200">
+                  Status <span className="text-red-500">*</span>
+                </label>
+                <select
+                  id="status"
+                  name="status"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  className={`bg-gray-50 border ${
+                    errors.status && touched.has('status')
+                      ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
+                      : 'border-gray-300 focus:ring-[#00A9E0] focus:border-[#00A9E0]'
+                  } text-gray-900 text-sm rounded-lg block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white transition-all duration-200`}
+                >
+                  <option value="">Sélectionner un statut</option>
+                  <option value="STOCKAGE">STOCKAGE</option>
+                  <option value="PRODUCTION">PRODUCTION</option>
+                  <option value="REPERATION">REPERATION</option>
+                </select>
+                {errors.status && touched.has('status') && (
+                  <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.status}</p>
+                )}
+              </div>
+
+              {/* Famille field */}
+              <div>
+                <label htmlFor="famille" className="block mb-2 text-sm font-semibold text-gray-700 dark:text-gray-200">
+                  Famille <span className="text-red-500">*</span>
+                </label>
+                <select
+                  id="famille"
+                  name="famille"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  className={`bg-gray-50 border ${
+                    errors.famille && touched.has('famille')
+                      ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
+                      : 'border-gray-300 focus:ring-[#00A9E0] focus:border-[#00A9E0]'
+                  } text-gray-900 text-sm rounded-lg block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white transition-all duration-200`}
+                >
+                  <option value="">Sélectionner une famille</option>
+                  <option value="A">A</option>
+                  <option value="B">B</option>
+                  <option value="C">C</option>
+                </select>
+                {errors.famille && touched.has('famille') && (
+                  <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.famille}</p>
                 )}
               </div>
 
@@ -289,10 +333,9 @@ export default function addModal({ isOpen, onClose, onSubmit }: CrudModalProps) 
                   } text-gray-900 text-sm rounded-lg block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white transition-all duration-200`}
                 >
                   <option value="">Sélectionner une catégorie</option>
-                  <option value="TV">TV/Moniteurs</option>
-                  <option value="PC">Ordinateurs</option>
-                  <option value="GA">Gaming/Console</option>
-                  <option value="PH">Téléphones</option>
+                  <option value="A">A</option>
+                  <option value="B">B</option>
+                  <option value="C">C</option>
                 </select>
                 {errors.category && touched.has('category') && (
                   <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.category}</p>

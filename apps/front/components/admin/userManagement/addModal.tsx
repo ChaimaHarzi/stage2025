@@ -13,8 +13,9 @@ interface FormErrors {
   email?: string;
   password?: string;
   confirmPassword?: string;
-  role?: string;
+  gender?: string;
   phone?: string;
+  dateOfBirth?: string;
 }
 
 export default function AddModal({ isOpen, onClose, onSubmit }: CrudModalProps) {
@@ -25,9 +26,12 @@ export default function AddModal({ isOpen, onClose, onSubmit }: CrudModalProps) 
   const [touched, setTouched] = useState<Set<string>>(new Set());
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<string>("");
   const closeTimeout = useRef<NodeJS.Timeout | null>(null);
   const firstInputRef = useRef<HTMLInputElement | null>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
+  const datePickerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -38,6 +42,8 @@ export default function AddModal({ isOpen, onClose, onSubmit }: CrudModalProps) 
       setIsSubmitting(false);
       setPasswordVisible(false);
       setConfirmPasswordVisible(false);
+      setSelectedDate("");
+      setShowDatePicker(false);
       // Reset form when opening
       if (formRef.current) {
         formRef.current.reset();
@@ -86,6 +92,20 @@ export default function AddModal({ isOpen, onClose, onSubmit }: CrudModalProps) 
     return () => document.removeEventListener('keydown', handleEscape);
   }, [show, onClose, isSubmitting]);
 
+  // Close date picker when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (datePickerRef.current && !datePickerRef.current.contains(event.target as Node)) {
+        setShowDatePicker(false);
+      }
+    };
+
+    if (showDatePicker) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [showDatePicker]);
+
   if (!show) return null;
 
   const validateField = (name: string, value: string, formData?: FormData): string | undefined => {
@@ -113,12 +133,19 @@ export default function AddModal({ isOpen, onClose, onSubmit }: CrudModalProps) 
         const password = formData?.get('password') as string;
         if (value !== password) return 'Les mots de passe ne correspondent pas';
         break;
-      case 'role':
-        if (!value) return 'Le rôle est requis';
+      case 'gender':
+        if (!value) return 'Le genre est requis';
         break;
       case 'phone':
         if (value && !/^(\+33|0)[1-9](\d{8})$/.test(value.replace(/\s/g, ''))) 
           return 'Format de téléphone invalide';
+        break;
+      case 'dateOfBirth':
+        if (!value) return 'La date de naissance est requise';
+        const birthDate = new Date(value);
+        const today = new Date();
+        const age = today.getFullYear() - birthDate.getFullYear();
+        if (age < 13 || age > 120) return 'L\'âge doit être entre 13 et 120 ans';
         break;
     }
     return undefined;
@@ -162,18 +189,100 @@ export default function AddModal({ isOpen, onClose, onSubmit }: CrudModalProps) 
     }
   };
 
+  const handleDateSelect = (date: string) => {
+    setSelectedDate(date);
+    setShowDatePicker(false);
+    setTouched(prev => new Set(prev).add('dateOfBirth'));
+    const error = validateField('dateOfBirth', date);
+    setErrors(prev => ({ ...prev, dateOfBirth: error }));
+  };
+
+  const generateCalendar = () => {
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const years = Array.from({ length: 100 }, (_, i) => currentYear - i);
+    const months = [
+      'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+      'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
+    ];
+
+    return (
+      <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg p-4">
+        <div className="flex gap-2 mb-3">
+          <select 
+            className="flex-1 p-2 border border-gray-300 rounded text-sm"
+            onChange={(e) => {
+              const year = parseInt(e.target.value);
+              const month = 0; // January
+              const date = new Date(year, month, 1).toISOString().split('T')[0];
+              handleDateSelect(date);
+            }}
+          >
+            <option value="">Année</option>
+            {years.map(year => (
+              <option key={year} value={year}>{year}</option>
+            ))}
+          </select>
+          <select 
+            className="flex-1 p-2 border border-gray-300 rounded text-sm"
+            onChange={(e) => {
+              const month = parseInt(e.target.value);
+              const year = new Date().getFullYear() - 25; // Default to 25 years ago
+              const date = new Date(year, month, 1).toISOString().split('T')[0];
+              handleDateSelect(date);
+            }}
+          >
+            <option value="">Mois</option>
+            {months.map((month, idx) => (
+              <option key={idx} value={idx}>{month}</option>
+            ))}
+          </select>
+        </div>
+        <div className="grid grid-cols-7 gap-1 text-center text-sm">
+          {['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'].map(day => (
+            <div key={day} className="p-2 font-semibold text-gray-600">{day}</div>
+          ))}
+          {Array.from({ length: 31 }, (_, i) => (
+            <button
+              key={i + 1}
+              type="button"
+              className="p-2 hover:bg-blue-100 rounded transition-colors"
+              onClick={() => {
+                const year = new Date().getFullYear() - 25;
+                const month = 0;
+                const day = i + 1;
+                const date = new Date(year, month, day).toISOString().split('T')[0];
+                handleDateSelect(date);
+              }}
+            >
+              {i + 1}
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     const form = e.target as HTMLFormElement;
     const formData = new FormData(form);
     
+    // Add selected date to form data
+    if (selectedDate) {
+      formData.set('dateOfBirth', selectedDate);
+    }
+    
     // Validate all fields
     const newErrors: FormErrors = {};
-    const fieldsToValidate = ['firstName', 'lastName', 'email', 'password', 'confirmPassword', 'role', 'phone'];
+    const fieldsToValidate = ['firstName', 'lastName', 'email', 'password', 'confirmPassword', 'gender', 'dateOfBirth', 'phone'];
     
     fieldsToValidate.forEach(field => {
-      const value = formData.get(field) as string;
+      let value = formData.get(field) as string;
+      if (field === 'dateOfBirth') {
+        value = selectedDate;
+      }
       if (field !== 'phone' || value) { // phone is optional
         const error = validateField(field, value, formData);
         if (error) newErrors[field as keyof FormErrors] = error;
@@ -213,7 +322,7 @@ export default function AddModal({ isOpen, onClose, onSubmit }: CrudModalProps) 
       
       {/* Modal */}
       <div
-        className={`relative w-full max-w-2xl max-h-[calc(100vh-6rem)] transition-all duration-300 transform ${
+        className={`relative w-full max-w-4xl max-h-[calc(100vh-6rem)] transition-all duration-300 transform ${
           closing
             ? 'scale-95 opacity-0 translate-y-4'
             : 'scale-100 opacity-100 translate-y-0'
@@ -262,10 +371,10 @@ export default function AddModal({ isOpen, onClose, onSubmit }: CrudModalProps) 
           }}>
             <form ref={formRef} className="p-6" onSubmit={handleSubmit}>
               <div className="space-y-6">
-                {/* Name fields - in a row */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Name fields - always in a row with proper spacing */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* First Name */}
-                  <div>
+                  <div className="min-w-0 flex-1">
                     <label htmlFor="firstName" className="block mb-2 text-sm font-semibold text-gray-700 dark:text-gray-200">
                       Prénom <span className="text-red-500">*</span>
                     </label>
@@ -281,11 +390,11 @@ export default function AddModal({ isOpen, onClose, onSubmit }: CrudModalProps) 
                           errors.firstName && touched.has('firstName')
                             ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
                             : 'border-gray-300 focus:ring-[#00A9E0] focus:border-[#00A9E0]'
-                        } text-gray-900 text-sm rounded-lg block w-full p-3 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white transition-all duration-200`}
+                        } text-gray-900 text-sm rounded-lg block w-full px-3 py-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white transition-all duration-200`}
                         placeholder="Ex: Jean"
                       />
                       {errors.firstName && touched.has('firstName') && (
-                        <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                        <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                           <svg className="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                           </svg>
@@ -298,7 +407,7 @@ export default function AddModal({ isOpen, onClose, onSubmit }: CrudModalProps) 
                   </div>
 
                   {/* Last Name */}
-                  <div>
+                  <div className="min-w-0 flex-1">
                     <label htmlFor="lastName" className="block mb-2 text-sm font-semibold text-gray-700 dark:text-gray-200">
                       Nom <span className="text-red-500">*</span>
                     </label>
@@ -313,11 +422,11 @@ export default function AddModal({ isOpen, onClose, onSubmit }: CrudModalProps) 
                           errors.lastName && touched.has('lastName')
                             ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
                             : 'border-gray-300 focus:ring-[#00A9E0] focus:border-[#00A9E0]'
-                        } text-gray-900 text-sm rounded-lg block w-full p-3 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white transition-all duration-200`}
+                        } text-gray-900 text-sm rounded-lg block w-full px-3 py-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white transition-all duration-200`}
                         placeholder="Ex: Dupont"
                       />
                       {errors.lastName && touched.has('lastName') && (
-                        <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                        <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                           <svg className="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                           </svg>
@@ -336,7 +445,7 @@ export default function AddModal({ isOpen, onClose, onSubmit }: CrudModalProps) 
                     Email <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <div className="absolute inset-y-0 left-0 flex items-center pl-1 pointer-events-none">
                       <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
                       </svg>
@@ -351,7 +460,7 @@ export default function AddModal({ isOpen, onClose, onSubmit }: CrudModalProps) 
                         errors.email && touched.has('email')
                           ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
                           : 'border-gray-300 focus:ring-[#00A9E0] focus:border-[#00A9E0]'
-                      } text-gray-900 text-sm rounded-lg block w-full pl-10 pr-3 py-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white transition-all duration-200`}
+                      } text-gray-900 text-sm rounded-lg block w-full pl- 9 pr-3 py-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white transition-all duration-200`}
                       placeholder="jean.dupont@company.com"
                     />
                   </div>
@@ -360,10 +469,10 @@ export default function AddModal({ isOpen, onClose, onSubmit }: CrudModalProps) 
                   )}
                 </div>
 
-                {/* Password fields - in a row */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Password fields - proper spacing */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* Password */}
-                  <div>
+                  <div className="min-w-0 flex-1">
                     <label htmlFor="password" className="block mb-2 text-sm font-semibold text-gray-700 dark:text-gray-200">
                       Mot de passe <span className="text-red-500">*</span>
                     </label>
@@ -378,12 +487,12 @@ export default function AddModal({ isOpen, onClose, onSubmit }: CrudModalProps) 
                           errors.password && touched.has('password')
                             ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
                             : 'border-gray-300 focus:ring-[#00A9E0] focus:border-[#00A9E0]'
-                        } text-gray-900 text-sm rounded-lg block w-full p-3 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white transition-all duration-200`}
+                        } text-gray-900 text-sm rounded-lg block w-full pl-3 pr-10 py-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white transition-all duration-200`}
                         placeholder="••••••••"
                       />
                       <button
                         type="button"
-                        className="absolute inset-y-0 right-0 flex items-center pr-3"
+                        className="absolute inset-y-0 right-3 flex items-center justify-center w-10 h-full hover:bg-gray-100 rounded-r-lg transition-colors"
                         onClick={() => setPasswordVisible(!passwordVisible)}
                       >
                         {passwordVisible ? (
@@ -404,7 +513,7 @@ export default function AddModal({ isOpen, onClose, onSubmit }: CrudModalProps) 
                   </div>
 
                   {/* Confirm Password */}
-                  <div>
+                  <div className="min-w-0 flex-1">
                     <label htmlFor="confirmPassword" className="block mb-2 text-sm font-semibold text-gray-700 dark:text-gray-200">
                       Confirmer <span className="text-red-500">*</span>
                     </label>
@@ -419,12 +528,12 @@ export default function AddModal({ isOpen, onClose, onSubmit }: CrudModalProps) 
                           errors.confirmPassword && touched.has('confirmPassword')
                             ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
                             : 'border-gray-300 focus:ring-[#00A9E0] focus:border-[#00A9E0]'
-                        } text-gray-900 text-sm rounded-lg block w-full p-3 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white transition-all duration-200`}
+                        } text-gray-900 text-sm rounded-lg block w-full pl-3 pr-10 py-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white transition-all duration-200`}
                         placeholder="••••••••"
                       />
                       <button
                         type="button"
-                        className="absolute inset-y-0 right-0 flex items-center pr-3"
+                        className="absolute inset-y-0 right-3 flex items-center justify-center w-10 h-full hover:bg-gray-100 rounded-r-lg transition-colors"
                         onClick={() => setConfirmPasswordVisible(!confirmPasswordVisible)}
                       >
                         {confirmPasswordVisible ? (
@@ -445,65 +554,115 @@ export default function AddModal({ isOpen, onClose, onSubmit }: CrudModalProps) 
                   </div>
                 </div>
 
-                {/* Role and Phone - in a row */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Role field */}
-                  <div>
-                    <label htmlFor="role" className="block mb-2 text-sm font-semibold text-gray-700 dark:text-gray-200">
-                      Rôle <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      id="role"
-                      name="role"
-                      onBlur={handleBlur}
-                      onChange={handleChange}
-                      className={`bg-gray-50 border ${
-                        errors.role && touched.has('role')
-                          ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
-                          : 'border-gray-300 focus:ring-[#00A9E0] focus:border-[#00A9E0]'
-                      } text-gray-900 text-sm rounded-lg block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white transition-all duration-200`}
-                    >
-                      <option value="">Sélectionner un rôle</option>
-                      <option value="Admin">Administrateur</option>
-                      <option value="Gestionnaire">Gestionnaire</option>
-                      <option value="Utilisateur">Utilisateur</option>
-                    </select>
-                    {errors.role && touched.has('role') && (
-                      <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.role}</p>
-                    )}
-                  </div>
+                  {/* Gender, Date of Birth and Phone - three columns */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+                      {/* Gender field */}   
+                        <div className="min-w-0 flex-1">
+                          <label htmlFor="gender" className="block mb-2 text-sm font-semibold text-gray-700 dark:text-gray-200">
+                            Genre <span className="text-red-500">*</span>
+                          </label>
+                          <div className="relative">
+                            <select
+                              id="gender"
+                              name="gender"
+                              onBlur={handleBlur}
+                              onChange={handleChange}
+                              className={`bg-gray-50 border ${
+                                errors.gender && touched.has('gender')
+                                  ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
+                                  : 'border-gray-300 focus:ring-[#00A9E0] focus:border-[#00A9E0]'
+                              } text-gray-900 text-sm rounded-lg block w-full pl-3 pr-10 py-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white transition-all duration-200 appearance-none`}
+                              style={{ 
+                                WebkitAppearance: 'none',
+                                MozAppearance: 'none',
+                                backgroundImage: 'none'
+                              }}
+                            >
+                              <option value="">Sélectionner le genre</option>
+                              <option value="Homme">Homme</option>
+                              <option value="Femme">Femme</option>
+                            </select>
+                            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                              </svg>
+                            </div>
+                          </div>
+                          {errors.gender && touched.has('gender') && (
+                            <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.gender}</p>
+                          )}
+                        </div>
 
-                  {/* Phone field */}
-                  <div>
-                    <label htmlFor="phone" className="block mb-2 text-sm font-semibold text-gray-700 dark:text-gray-200">
-                      Téléphone
-                      <span className="ml-2 text-xs font-normal text-gray-500">(Optionnel)</span>
-                    </label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                        </svg>
-                      </div>
-                      <input
-                        type="tel"
-                        name="phone"
-                        id="phone"
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        className={`bg-gray-50 border ${
-                          errors.phone && touched.has('phone')
-                            ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
-                            : 'border-gray-300 focus:ring-[#00A9E0] focus:border-[#00A9E0]'
-                        } text-gray-900 text-sm rounded-lg block w-full pl-10 pr-3 py-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white transition-all duration-200`}
-                        placeholder="06 12 34 56 78"
-                      />
-                    </div>
-                    {errors.phone && touched.has('phone') && (
-                      <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.phone}</p>
-                    )}
-                  </div>
-                </div>
+                          {/* Date of Birth field with calendar */}
+                            <div className="min-w-0 flex-1 relative" ref={datePickerRef}>
+                              <label htmlFor="dateOfBirth" className="block mb-2 text-sm font-semibold text-gray-700 dark:text-gray-200">
+                                              Date de naissance <span className="text-red-500">*</span>
+                                            </label>
+                                            <div className="relative">
+                                              <div className="absolute inset-y-0 left-0 flex items-center pl-1 pointer-events-none">
+                                                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                </svg>
+                                              </div>
+                                              <input
+                                                type="text"
+                                                name="dateOfBirth"
+                                                id="dateOfBirth"
+                                                value={selectedDate ? new Date(selectedDate).toLocaleDateString('fr-FR') : ''}
+                                                onClick={() => setShowDatePicker(!showDatePicker)}
+                                                onBlur={(e) => {
+                                                  if (!datePickerRef.current?.contains(e.relatedTarget as Node)) {
+                                                    setTouched(prev => new Set(prev).add('dateOfBirth'));
+                                                    const error = validateField('dateOfBirth', selectedDate);
+                                                    setErrors(prev => ({ ...prev, dateOfBirth: error }));
+                                                  }
+                                                }}
+                                                readOnly
+                                                className={`bg-gray-50 border ${
+                                                  errors.dateOfBirth && touched.has('dateOfBirth')
+                                                    ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
+                                                    : 'border-gray-300 focus:ring-[#00A9E0] focus:border-[#00A9E0]'
+                                                } text-gray-900 text-sm rounded-lg block w-full pl-10 pr-3 py-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white transition-all duration-200 cursor-pointer`}
+                                                placeholder="Sélectionner la date"
+                                              />
+                                            </div>
+                                            {showDatePicker && generateCalendar()}
+                                            {errors.dateOfBirth && touched.has('dateOfBirth') && (
+                                              <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.dateOfBirth}</p>
+                                            )}
+                                          </div>
+
+                                          {/* Phone field */}
+                                          <div className="min-w-0 flex-1">
+                                            <label htmlFor="phone" className="block mb-2 text-sm font-semibold text-gray-700 dark:text-gray-200">
+                                              Téléphone
+                                              <span className="ml-2 text-xs font-normal text-gray-500">(Optionnel)</span>
+                                            </label>
+                                            <div className="relative">
+                                              <div className="absolute inset-y-0 left-0 flex items-center pl-1 pointer-events-none">
+                                                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                                </svg>
+                                              </div>
+                                              <input
+                                                type="tel"
+                                                name="phone"
+                                                id="phone"
+                                                onBlur={handleBlur}
+                                                onChange={handleChange}
+                                                className={`bg-gray-50 border ${
+                                                  errors.phone && touched.has('phone')
+                                                    ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
+                                                    : 'border-gray-300 focus:ring-[#00A9E0] focus:border-[#00A9E0]'
+                                                } text-gray-900 text-sm rounded-lg block w-full pl-10 pr-3 py-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white transition-all duration-200`}
+                                                placeholder="06 12 34 56 78"
+                                              />
+                                            </div>
+                                            {errors.phone && touched.has('phone') && (
+                                              <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.phone}</p>
+                                            )}
+                                          </div>
+                                        </div>
               </div>
 
               {/* Form actions */}

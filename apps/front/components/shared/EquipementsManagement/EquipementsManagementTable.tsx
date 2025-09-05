@@ -81,7 +81,7 @@ export default function EquipementsManagementTable() {
             <input
               id="custom-search"
               type="text"
-              className="h-9 px-3 border-none bg-white text-sm text-gray-800 placeholder-gray-400 focus:outline-none w-full"
+              className="h-9 px-3 bg-white text-sm text-gray-800 placeholder-gray-400 focus:outline-none w-full border-none"
               placeholder="Search..."
               onChange={e => {
                 if (dtRef.current) {
@@ -99,7 +99,13 @@ export default function EquipementsManagementTable() {
           <div className="relative">
             <select
               id="custom-page-length"
-                className="h-11 py-2 px-4 pr-8 border border-gray-200 rounded-lg text-sm text-gray-800 bg-white shadow-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 w-20 appearance-none transition-colors duration-150"
+              className="h-11 py-2 px-4 pr-8 border border-gray-200 rounded-lg text-sm text-gray-800 bg-white shadow-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 w-20 transition-colors duration-150"
+              style={{ 
+                appearance: 'none', 
+                WebkitAppearance: 'none', 
+                MozAppearance: 'none',
+                backgroundImage: 'none'
+              }}
               defaultValue="10"
             >
               <option value="10">10</option>
@@ -331,5 +337,3 @@ export default function EquipementsManagementTable() {
     </>
   );
 }
-
-

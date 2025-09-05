@@ -129,7 +129,13 @@ export default function UsersManagementTable() {
           <div className="relative">
             <select
               id="custom-page-length"
-                className="h-11 py-2 px-4 pr-8 border border-gray-200 rounded-lg text-sm text-gray-800 bg-white shadow-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 w-20 appearance-none transition-colors duration-150"
+              className="h-11 py-2 px-4 pr-10 border border-gray-200 rounded-lg text-sm text-gray-800 bg-white shadow-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 w-20 transition-colors duration-150"
+              style={{ 
+                WebkitAppearance: 'none',
+                MozAppearance: 'none', 
+                appearance: 'none',
+                backgroundImage: 'none'
+              }}
               defaultValue="10"
             >
               <option value="10">10</option>
@@ -138,11 +144,11 @@ export default function UsersManagementTable() {
               <option value="25">25</option>
               <option value="50">50</option>
             </select>
-            <span className="pointer-events-none absolute inset-y-0 right-2 flex items-center">
-              <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <div className="pointer-events-none absolute inset-y-0 right-2 flex items-center">
+              <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
               </svg>
-            </span>
+            </div>
           </div>
           </div>
           <button
@@ -242,7 +248,7 @@ export default function UsersManagementTable() {
                 </th>
                 <th className="p-2 text-left font-bold text-gray-700 bg-white border-b border-gray-200">
                   <span className="flex items-center gap-1">
-                    Rôle
+                    Numéro de téléphone
                     <button
                       type="button"
                       className="ml-1 focus:outline-none"
@@ -268,7 +274,7 @@ export default function UsersManagementTable() {
                 </th>
                 <th className="p-2 text-left font-bold text-gray-700 bg-white border-b border-gray-200">
                   <span className="flex items-center gap-1">
-                    Statut
+                      Genre
                     <button
                       type="button"
                       className="ml-1 focus:outline-none"

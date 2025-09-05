@@ -20,32 +20,32 @@ const navItems: NavItem[] = [
   {
     icon: <GridIcon />,
     name: "Dashboard",
-    path: "/dashboard",
+    path: "/admin/dashboard",
   },
   {
     name: "Equipements",
     icon: <ListIcon />,
-    path: "/equipments",
+    path: "/admin/equipements",
   },
   {
     icon: <UserCircleIcon />,
     name: "Utilisateurs",
-    path: "/users",
+    path: "/admin/users",
   },
   {
     name: "Scan Logs",
     icon: <TableIcon />,
-    path: "/scan-logs",
+    path: "/admin/scan-logs",
   },
   {
     name: "Familles",
     icon: <PageIcon />,
-    path: "/families",
+    path: "/admin/families",
   },
   {
     icon: <GridIcon />,
     name: "Catégories",
-    path: "/categories",
+    path: "/admin/categories",
   },
 ];
 
@@ -133,7 +133,7 @@ const AppSidebar: React.FC = () => {
                   <HorizontaLDots />
                 )}
               </h2>
-              <ul className='flex flex-col gap-4'>
+              <ul className='flex flex-col gap-15'>
                 {navItems.map((item, index) => {
                   const key = `main-${index}`;
                   return (
