@@ -1,18 +1,27 @@
 /** @format */
-"use client";
 
 import AppHeader from "@/components/shared/Header/AppHeader";
-import { SidebarProvider, useSidebar } from "@/components/shared/Sidebar/SidebarContext";
+import { SidebarProvider } from "@/components/shared/Sidebar/SidebarContext";
 import { ThemeProvider } from "@/components/shared/Theme/ThemeContext";
 import AppSidebar from "@/components/shared/Sidebar/AppSidebar";
 import Backdrop from "@/components/shared/Sidebar/Backdrop";
-import React, { useEffect } from "react";
+import PrelineLoader from "@/components/providers/PrelineLoader";
+import AdminPageLayoutClient from "./AdminPageLayoutClient";
 
-const AdminPageLayout = ({ children }: { children: React.ReactNode }) => {
-    useEffect(() => {
-        import('preline');
-    }, []);
-    const { isExpanded, isMobileOpen, isHovered } = useSidebar();
+export default function AdminLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <ThemeProvider>
+        <SidebarProvider>
+            <PrelineLoader />
+            <AdminPageLayoutClient>{children}</AdminPageLayoutClient>
+        </SidebarProvider>
+    </ThemeProvider>
+  );
+}
     return (
         <div className="bg-[#f5f6fa] flex h-screen">
             <AppSidebar />

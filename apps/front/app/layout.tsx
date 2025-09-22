@@ -1,5 +1,4 @@
 /** @format */
-"use client";
 import "./globals.css";
 import 'flowbite';
 import { Theme } from "@radix-ui/themes";
@@ -10,8 +9,8 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
-import { SessionProvider } from "next-auth/react";
 import 'datatables.net-dt/css/jquery.dataTables.css';
+import SessionWrapper from "../components/providers/SessionWrapper";
 
 export default function RootLayout({
   children,
@@ -22,11 +21,11 @@ export default function RootLayout({
     <html lang='fr' className={inter.variable}>
       <body>
   <Theme>
-        <SessionProvider>
+        <SessionWrapper>
           <main className="bg-[#f5f6fa] min-h-screen">
             {children}
           </main>
-        </SessionProvider>
+        </SessionWrapper>
   </Theme>
       </body>
     </html>
