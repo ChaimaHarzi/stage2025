@@ -1,88 +1,59 @@
 "use client";
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 
 type SidebarContextType = {
+  /** Menu déplié sur grand écran (sinon : icônes seules). */
   isExpanded: boolean;
+  /** Menu ouvert en tiroir sur mobile. */
   isMobileOpen: boolean;
-  isHovered: boolean;
-  activeItem: string | null;
-  openSubmenu: string | null;
   toggleSidebar: () => void;
   toggleMobileSidebar: () => void;
-  setIsHovered: (isHovered: boolean) => void;
-  setActiveItem: (item: string | null) => void;
-  toggleSubmenu: (item: string) => void;
+  closeMobileSidebar: () => void;
 };
 
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
 
-// Make sure this export is present
 export const useSidebar = () => {
   const context = useContext(SidebarContext);
-  if (!context) {
-    throw new Error("useSidebar must be used within a SidebarProvider");
-  }
+  if (!context) throw new Error("useSidebar must be used within a SidebarProvider");
   return context;
 };
 
-export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+const STORAGE_KEY = "sidebar-expanded";
+
+export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
-  const [activeItem, setActiveItem] = useState<string | null>(null);
-  const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
 
+  // Préférence mémorisée entre les visites.
   useEffect(() => {
-    const handleResize = () => {
-      const mobile = window.innerWidth < 768;
-      setIsMobile(mobile);
-      if (!mobile) {
-        setIsMobileOpen(false);
-      }
-    };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
+    try {
+      if (localStorage.getItem(STORAGE_KEY) === "false") setIsExpanded(false);
+    } catch {}
   }, []);
 
-  const toggleSidebar = () => {
-    setIsExpanded((prev) => !prev);
-  };
+  // Le tiroir mobile se ferme quand on repasse en grand écran.
+  useEffect(() => {
+    const onResize = () => window.innerWidth >= 1024 && setIsMobileOpen(false);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
 
-  const toggleMobileSidebar = () => {
-    setIsMobileOpen((prev) => !prev);
-  };
+  const toggleSidebar = useCallback(() => {
+    setIsExpanded((prev) => {
+      try {
+        localStorage.setItem(STORAGE_KEY, String(!prev));
+      } catch {}
+      return !prev;
+    });
+  }, []);
 
-  const toggleSubmenu = (item: string) => {
-    setOpenSubmenu((prev) => (prev === item ? null : item));
-  };
+  const toggleMobileSidebar = useCallback(() => setIsMobileOpen((prev) => !prev), []);
+  const closeMobileSidebar = useCallback(() => setIsMobileOpen(false), []);
 
   return (
-    <SidebarContext.Provider
-      value={{
-        isExpanded: isMobile ? false : isExpanded,
-        isMobileOpen,
-        isHovered,
-        activeItem,
-        openSubmenu,
-        toggleSidebar,
-        toggleMobileSidebar,
-        setIsHovered,
-        setActiveItem,
-        toggleSubmenu,
-      }}
-    >
+    <SidebarContext.Provider value={{ isExpanded, isMobileOpen, toggleSidebar, toggleMobileSidebar, closeMobileSidebar }}>
       {children}
     </SidebarContext.Provider>
   );
 };
-
-// Add this if you want to use SidebarContext directly
-export default SidebarContext;

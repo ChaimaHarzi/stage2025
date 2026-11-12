@@ -1,32 +1,35 @@
 /** @format */
 import "./globals.css";
-import 'flowbite';
-import { Theme } from "@radix-ui/themes";
+import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-const inter = Inter({
-  subsets: ["latin"],
-  weight: ["400", "600", "700"],
-  variable: "--font-inter",
-});
-
-import 'datatables.net-dt/css/jquery.dataTables.css';
+import { Toaster } from "sonner";
 import SessionWrapper from "../components/providers/SessionWrapper";
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
+export const metadata: Metadata = {
+  title: { default: "Sagemcom — Parc équipements", template: "%s · Sagemcom" },
+  description: "Gestion des équipements industriels avec traçabilité par code-barres",
+};
+
+/** Applique le thème enregistré avant l'affichage, pour éviter un flash blanc en mode sombre. */
+const themeScript = `try{if(localStorage.getItem("theme")==="dark")document.documentElement.classList.add("dark")}catch(e){}`;
+
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang='fr' className={inter.variable}>
+    <html lang="fr" className={inter.variable} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body>
-  <Theme>
         <SessionWrapper>
-          <main className="bg-[#f5f6fa] min-h-screen">
-            {children}
-          </main>
+          {children}
+          <Toaster position="top-right" richColors closeButton toastOptions={{ className: "font-sans" }} />
         </SessionWrapper>
-  </Theme>
       </body>
     </html>
   );

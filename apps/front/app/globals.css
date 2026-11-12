@@ -1,44 +1,55 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "flowbite/src/themes/default";
-@import "@radix-ui/themes/styles.css";
 
-@plugin "flowbite/plugin";
+/* Le mode sombre suit la classe .dark posée par ThemeContext (et non la préférence système). */
+@custom-variant dark (&:where(.dark, .dark *));
 
+@theme {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 
+  /* Couleur de marque (bleu Sagemcom) */
+  --color-brand-50: #eef7ff;
+  --color-brand-100: #d9edff;
+  --color-brand-200: #bce0ff;
+  --color-brand-300: #8ecdff;
+  --color-brand-400: #59b0fc;
+  --color-brand-500: #338ff8;
+  --color-brand-600: #1d70ed;
+  --color-brand-700: #155ad9;
+  --color-brand-800: #1849b0;
+  --color-brand-900: #19408b;
+  --color-brand-950: #142854;
 
-body {
-  @apply font-sans;
+  --shadow-card: 0 1px 2px 0 rgb(15 23 42 / 0.04), 0 1px 3px 0 rgb(15 23 42 / 0.06);
 }
 
-input{
-  @apply w-[400px] border border-gray-200 py-2 px-6;
-}
-
-/* DataTables sort icons for Tailwind custom table */
-th.sorting:after,
-th.sorting_asc:after,
-th.sorting_desc:after {
-  content: '';
-  display: inline-block;
-  margin-left: 0.5em;
-  vertical-align: middle;
-  width: 0;
-  height: 0;
-  border-left: 4px solid transparent;
-  border-right: 4px solid transparent;
-}
-
-th.sorting:after {
-  border-top: 6px solid #ccc;
-}
-
-th.sorting_asc:after {
-  border-bottom: 6px solid #007bff;
-}
-
-th.sorting_desc:after {
-  border-top: 6px solid #007bff;
+@layer base {
+  html {
+    color-scheme: light;
+  }
+  html.dark {
+    color-scheme: dark;
+  }
+  body {
+    @apply bg-slate-50 font-sans text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100;
+    font-feature-settings: "cv11", "ss01";
+  }
+  /* Chiffres alignés dans les tableaux et indicateurs */
+  table,
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+  ::selection {
+    @apply bg-brand-100 text-brand-900;
+  }
+  /* Listes déroulantes : flèche homogène avec le reste des champs */
+  select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.6rem center;
+    background-size: 1rem;
+  }
 }
 
 @layer utilities {
@@ -46,8 +57,14 @@ th.sorting_desc:after {
     display: none;
   }
   .no-scrollbar {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  /* Motif de grille discret pour le panneau de marque (connexion / inscription) */
+  .bg-grid {
+    background-image:
+      linear-gradient(to right, rgb(255 255 255 / 0.06) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(255 255 255 / 0.06) 1px, transparent 1px);
+    background-size: 40px 40px;
   }
 }
-

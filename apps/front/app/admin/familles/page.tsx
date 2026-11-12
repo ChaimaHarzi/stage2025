@@ -1,7 +1,5 @@
+import ClassificationCards from "@/components/admin/classifications/ClassificationCards";
 
-import FamilleCards from "@/components/admin/familleManagement/familleCards";
-
-
-export default function EquipementsPage() {
-  return <FamilleCards />;
+export default function FamillesPage() {
+  return <ClassificationCards kind="famille" />;
 }

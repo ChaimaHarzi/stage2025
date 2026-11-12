@@ -1,0 +1,285 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type AuthPayload {
+  accessToken: String!
+  utilisateur: Utilisateur!
+}
+
+type Categorie {
+  couleur: String!
+  createdAt: DateTime!
+  description: String
+  id: ID!
+  nom: String!
+
+  """Nombre d'équipements rattachés"""
+  nombreEquipements: Int!
+}
+
+input ChangePasswordInput {
+  ancienMotDePasse: String!
+  nouveauMotDePasse: String!
+}
+
+input ClassificationInput {
+  couleur: String
+  description: String
+  nom: String!
+}
+
+type ClassificationResume {
+  couleur: String!
+  id: ID!
+  nom: String!
+}
+
+input CreateUtilisateurInput {
+  dateDeNaissance: DateTime!
+  email: String!
+  genre: Genre!
+  nom: String!
+  password: String!
+  prenom: String!
+  role: Role!
+  telephone: String!
+}
+
+type DashboardStats {
+  derniersScans: [ScanLog!]!
+  enProduction: Int!
+  enReparation: Int!
+  enStock: Int!
+  parCategorie: [RepartitionItem!]!
+  parFamille: [RepartitionItem!]!
+  scansAujourdhui: Int!
+  totalCategories: Int!
+  totalEquipements: Int!
+  totalFamilles: Int!
+  totalOuvriers: Int!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Equipement {
+  categorie: ClassificationResume!
+  createdAt: DateTime!
+  description: String
+  famille: ClassificationResume!
+  id: ID!
+  nom: String!
+
+  """Référence encodée dans le code-barres"""
+  reference: String!
+  status: Status!
+  updatedAt: DateTime!
+}
+
+input EquipementInput {
+  categorieId: ID!
+  description: String
+  familleId: ID!
+  nom: String!
+  reference: String!
+  status: Status
+}
+
+type EquipementOuvrier {
+  id: ID!
+  nom: String!
+  reference: String!
+  status: Status!
+  updatedAt: DateTime!
+}
+
+type EquipementResume {
+  id: ID!
+  nom: String!
+  reference: String!
+}
+
+type Famille {
+  couleur: String!
+  createdAt: DateTime!
+  description: String
+  id: ID!
+  nom: String!
+
+  """Nombre d'équipements rattachés"""
+  nombreEquipements: Int!
+}
+
+enum Genre {
+  Femme
+  Homme
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+type Mutation {
+  changePassword(input: ChangePasswordInput!): Boolean!
+  createCategorie(input: ClassificationInput!): Categorie!
+  createEquipement(input: EquipementInput!): Equipement!
+  createFamille(input: ClassificationInput!): Famille!
+  createUtilisateur(input: CreateUtilisateurInput!): Utilisateur!
+  deleteCategorie(id: ID!): Boolean!
+  deleteEquipement(id: ID!): Boolean!
+  deleteFamille(id: ID!): Boolean!
+  deleteUtilisateur(id: ID!): Boolean!
+  login(input: LoginInput!): AuthPayload!
+
+  """Change le statut d'un équipement selon le nombre de scans"""
+  scanEquipement(input: ScanInput!): ScanResult!
+  signUp(input: SignUpInput!): Utilisateur!
+  updateCategorie(id: ID!, input: UpdateClassificationInput!): Categorie!
+  updateEquipement(id: ID!, input: UpdateEquipementInput!): Equipement!
+  updateFamille(id: ID!, input: UpdateClassificationInput!): Famille!
+  updateProfile(input: UpdateProfileInput!): Utilisateur!
+  updateUtilisateur(id: ID!, input: UpdateUtilisateurInput!): Utilisateur!
+}
+
+type Query {
+  categories(search: String): [Categorie!]!
+  dashboardStats: DashboardStats!
+  equipement(id: ID!): Equipement!
+  equipements(categorieId: ID, familleId: ID, search: String, status: Status): [Equipement!]!
+
+  """Liste restreinte (nom et statut) pour les ouvriers"""
+  equipementsOuvrier(search: String, status: Status): [EquipementOuvrier!]!
+  familles(search: String): [Famille!]!
+
+  """Profil de l'utilisateur connecté"""
+  me: Utilisateur!
+  scanLogs(filter: ScanLogsFilter): [ScanLog!]!
+  utilisateur(id: ID!): Utilisateur!
+  utilisateurs(role: Role, search: String): [Utilisateur!]!
+}
+
+type RepartitionItem {
+  couleur: String!
+  nom: String!
+  total: Int!
+}
+
+enum Role {
+  ADMIN
+  OUVRIER
+}
+
+input ScanInput {
+  """Nombre de lectures successives (1, 2 ou 3)"""
+  nombreScans: Int!
+
+  """Référence lue sur le code-barres"""
+  reference: String!
+}
+
+type ScanLog {
+  ancienStatus: Status!
+  createdAt: DateTime!
+  equipement: EquipementResume!
+  id: ID!
+  nombreScans: Int!
+  nouveauStatus: Status!
+  source: ScanSource!
+
+  """Absent pour un scan du système embarqué"""
+  utilisateur: UtilisateurResume
+}
+
+input ScanLogsFilter {
+  equipementId: ID
+  limit: Int = 200
+  search: String
+  source: ScanSource
+}
+
+type ScanResult {
+  ancienStatus: Status!
+  equipement: EquipementResume!
+  nombreScans: Int!
+  nouveauStatus: Status!
+}
+
+enum ScanSource {
+  RASPBERRY
+  WEB
+}
+
+input SignUpInput {
+  dateDeNaissance: DateTime!
+  email: String!
+  genre: Genre!
+  nom: String!
+  password: String!
+  prenom: String!
+  telephone: String!
+}
+
+"""STOCK = en stock, PROD = en production, REP = en réparation"""
+enum Status {
+  PROD
+  REP
+  STOCK
+}
+
+input UpdateClassificationInput {
+  couleur: String
+  description: String
+  nom: String
+}
+
+input UpdateEquipementInput {
+  categorieId: ID
+  description: String
+  familleId: ID
+  nom: String
+  reference: String
+  status: Status
+}
+
+input UpdateProfileInput {
+  dateDeNaissance: DateTime
+  email: String
+  genre: Genre
+  nom: String
+  prenom: String
+  telephone: String
+}
+
+input UpdateUtilisateurInput {
+  dateDeNaissance: DateTime
+  email: String
+  genre: Genre
+  nom: String
+  password: String
+  prenom: String
+  role: Role
+  telephone: String
+}
+
+type Utilisateur {
+  createdAt: DateTime!
+  dateDeNaissance: DateTime
+  email: String!
+  genre: Genre
+  id: ID!
+  nom: String
+  prenom: String
+  role: Role!
+  telephone: String
+}
+
+type UtilisateurResume {
+  email: String!
+  id: ID!
+  nom: String
+  prenom: String
+}

@@ -1,0 +1,97 @@
+// Modèle de données — d'après les diagrammes de classes du rapport (sprints 1 à 4).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  OUVRIER
+}
+
+enum Genre {
+  Homme
+  Femme
+}
+
+/// STOCK = en stock, PROD = en production, REP = en réparation
+enum Status {
+  STOCK
+  PROD
+  REP
+}
+
+/// Origine d'un scan : interface web de l'ouvrier ou système embarqué (Raspberry Pi)
+enum ScanSource {
+  WEB
+  RASPBERRY
+}
+
+model Utilisateur {
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  email           String    @unique
+  password        String
+  nom             String?
+  prenom          String?
+  telephone       String?
+  genre           Genre?
+  dateDeNaissance DateTime?
+  role            Role      @default(OUVRIER)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  scans           ScanLog[]
+}
+
+model Categorie {
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  nom         String       @unique
+  description String?
+  couleur     String       @default("blue")
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  equipements Equipement[]
+}
+
+model Famille {
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  nom         String       @unique
+  description String?
+  couleur     String       @default("blue")
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  equipements Equipement[]
+}
+
+model Equipement {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  /// Référence encodée dans le code-barres (refQR dans le diagramme de classes)
+  reference   String    @unique
+  nom         String
+  description String?
+  status      Status    @default(STOCK)
+  categorieId String    @db.ObjectId
+  categorie   Categorie @relation(fields: [categorieId], references: [id], onDelete: Restrict)
+  familleId   String    @db.ObjectId
+  famille     Famille   @relation(fields: [familleId], references: [id], onDelete: Restrict)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  scans       ScanLog[]
+}
+
+model ScanLog {
+  id            String       @id @default(auto()) @map("_id") @db.ObjectId
+  equipementId  String       @db.ObjectId
+  equipement    Equipement   @relation(fields: [equipementId], references: [id], onDelete: Cascade)
+  utilisateurId String?      @db.ObjectId
+  utilisateur   Utilisateur? @relation(fields: [utilisateurId], references: [id], onDelete: SetNull)
+  source        ScanSource
+  nombreScans   Int
+  ancienStatus  Status
+  nouveauStatus Status
+  createdAt     DateTime     @default(now())
+}

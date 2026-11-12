@@ -1,5 +1,5 @@
-import EquipementsManagementTable from "@/components/shared/EquipementsManagement/EquipementsManagementTable";
+import EquipementsManagement from "@/components/admin/equipementsManagement/EquipementsManagement";
 
 export default function EquipementsPage() {
-  return <EquipementsManagementTable />;
+  return <EquipementsManagement />;
 }

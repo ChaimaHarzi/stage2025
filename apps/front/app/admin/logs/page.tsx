@@ -1,5 +1,5 @@
-import LogsTable from "@/components/admin/logsTable/logsTable";
+import ScanLogs from "@/components/admin/logsTable/ScanLogs";
 
 export default function LogsPage() {
-  return <LogsTable />;
+  return <ScanLogs />;
 }

@@ -1,6 +1,5 @@
-import UsersManagementTable from "@/components/admin/userManagement/userManagementTable";
-import EquipementsManagementTable from "@/components/shared/EquipementsManagement/EquipementsManagementTable";
+import UsersManagement from "@/components/admin/userManagement/UsersManagement";
 
-export default function EquipementsPage() {
-  return <UsersManagementTable />;
+export default function UsersPage() {
+  return <UsersManagement />;
 }
